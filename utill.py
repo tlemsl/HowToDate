@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import matplotlib.pylab as plt
 
-def similiaity(img1, img2, threshold):
+def similiaity(img1, img2):
     imgs = [img1, img2]
     hists = []
     for img in imgs:

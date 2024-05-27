@@ -20,7 +20,7 @@ class QLearningAgent:
         self.discount = discount
 
     def get_qvalue(self, state, action):
-        return self._qvalues[state][action] #뭐지.....왜안되지
+        return self._qvalues[state][action] 
 
     def set_qvalue(self, state, action, value):
         self._qvalues[state][action] = value
@@ -66,3 +66,4 @@ class QLearningAgent:
           chosen_action=self.get_best_action(t_state)
 
         return chosen_action
+

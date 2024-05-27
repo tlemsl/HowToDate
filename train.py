@@ -18,9 +18,9 @@ def play_and_train(env, agent, t_max=10**4):
         
         # get agent to pick action given state s.
         r=0
-        for i in range(30):
-            pyautogui.press('enter')
-            time.sleep(0.2)
+        # for i in range(30):
+        #     pyautogui.press('enter')
+        #     time.sleep(0.2)
         while r==0:
             a = agent.get_action(s)
             next_s, r, done= env.step(s, a)
