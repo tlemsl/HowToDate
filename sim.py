@@ -1,6 +1,7 @@
 import pyautogui
 import time
 from PIL import ImageGrab
+import numpy as np
 
 pyautogui.FAILSAFE = False
 """
