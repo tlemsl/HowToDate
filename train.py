@@ -12,7 +12,7 @@ def play_and_train(env, agent, t_max=10**4):
     - return total reward
     """
     total_reward = 0.0
-    s=env.get_state()
+    s=env.reset()
 
     for t in range(t_max):
         
@@ -23,6 +23,8 @@ def play_and_train(env, agent, t_max=10**4):
         #     time.sleep(0.2)
         while r==0:
             a = agent.get_action(s)
+            print(a)
+            
             next_s, r, done= env.step(s, a)
 
         # train (update) agent for state s
@@ -37,8 +39,8 @@ def play_and_train(env, agent, t_max=10**4):
 
 if __name__ == "__main__":
     actions = []
-    for i in range(100):
-        for j in range(100):
+    for i in range(18):
+        for j in range(10):
             for t in ["d", "c"]:
                 actions.append((i,j,t))
     

@@ -4,11 +4,6 @@ import math
 import numpy as np
 
 
-def numpy_to_tuple(array):
-    if isinstance(array, np.ndarray):
-        return tuple(numpy_to_tuple(sub_array) for sub_array in array)
-    else:
-        return array
 
 
 class QLearningAgent:
@@ -35,15 +30,11 @@ class QLearningAgent:
     def update(self, state, action, reward, next_state):
         gamma = self.discount
         learning_rate = self.alpha
-        next_array=np.array(next_state)
-        s_array=np.array(state)
-        t_next_state=numpy_to_tuple(next_array)
-        t_state=numpy_to_tuple(s_array)
-        next_value=self.get_value(t_next_state)
-        current_qvalue=self.get_qvalue(t_state, action)
+        next_value=self.get_value(next_state)
+        current_qvalue=self.get_qvalue(state, action)
         updated_qvalue=(1-learning_rate)*current_qvalue+learning_rate*(reward+gamma*next_value)
 
-        self.set_qvalue(t_state, action, updated_qvalue) 
+        self.set_qvalue(state, action, updated_qvalue) 
 
     def get_best_action(self, state):
 
@@ -54,8 +45,6 @@ class QLearningAgent:
         return best_action
 
     def get_action(self, state):
-        s_array=np.array(state)
-        t_state=numpy_to_tuple(s_array)
         action = None
         if len(self.actions) == 0:
             return None
@@ -63,7 +52,7 @@ class QLearningAgent:
         if random.random()<epsilon:
           chosen_action=random.choice(self.actions)
         else:
-          chosen_action=self.get_best_action(t_state)
+          chosen_action=self.get_best_action(state)
 
         return chosen_action
 

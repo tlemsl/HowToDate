@@ -24,7 +24,6 @@ action
         w: wheel
 
 """
-
 class DateSimulation:
     def __init__(self, resolution = "720x405", start_pixel = (0,30), scale=(18,10)) -> None:
         
@@ -40,12 +39,12 @@ class DateSimulation:
         return x//self._scale[0]*self._width + self._start_x, y//self._scale[1]*self._height + self._start_y
 
     def get_image(self):
-        return ImageGrab.grab((self._start_x, self._start_y, self._start_x+self._width, self._start_y + self._height))
+        return utill.PIL2OpenCV(ImageGrab.grab((self._start_x, self._start_y, self._start_x+self._width, self._start_y + self._height)))
     
     def get_state(self):
-        image=ImageGrab.grab((0, 30, 720, 435))
+        image=self.get_image()
         image_array=np.array(image)
-        return image #self._wait_for_stabilized()
+        return utill.numpy2tuple(image_array) #self._wait_for_stabilized()
     
     def step(self, state, action):
         x, y, type = action
@@ -75,11 +74,11 @@ class DateSimulation:
         return  next_state, reward, done
 
     def _wait_for_stabilized(self):
-        prev_state = self.get_image()
+        prev_state = self.get_state()
         while True:
             time.sleep(0.5)
             self._try_to_skip()
-            current_state = self.get_image()
+            current_state = self.get_state()
             print(utill.similiaity(current_state, prev_state))
             if utill.similiaity(current_state, prev_state) < self._threshold:
                 return current_state
@@ -111,7 +110,8 @@ class DateSimulation:
         time.sleep(0.1)
         pyautogui.moveTo(150 + self._start_x, 200 + self._start_y)
         pyautogui.click()
-        time.sleep(2)   
+        time.sleep(2)
+        return self._wait_for_stabilized()
 
     def is_ending(self):
         img = self.get_image()
