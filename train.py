@@ -1,5 +1,7 @@
 from sim import DateSimulation
 from agent import QLearningAgent
+import pyautogui
+import time
 
 
 def play_and_train(env, agent, t_max=10**4):
@@ -21,7 +23,7 @@ def play_and_train(env, agent, t_max=10**4):
             time.sleep(0.2)
         while r==0:
             a = agent.get_action(s)
-            next_s, r, done, _, _ = env.step(a)
+            next_s, r, done= env.step(s, a)
 
         # train (update) agent for state s
         agent.update(s, a,r,next_s)
@@ -41,6 +43,5 @@ if __name__ == "__main__":
                 actions.append((i,j,t))
     
     env = DateSimulation(resolution="720x405")
-    agent = QLearningAgent(alpha=0.5, epsilon=0.2, discount=0.99,
-                           get_legal_actions=actions)
+    agent = QLearningAgent(actions, alpha=0.5, epsilon=0.2, discount=0.99)
     play_and_train(env=env, agent=agent)
