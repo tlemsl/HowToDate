@@ -4,115 +4,65 @@ import math
 import numpy as np
 
 
+def numpy_to_tuple(array):
+    if isinstance(array, np.ndarray):
+        return tuple(numpy_to_tuple(sub_array) for sub_array in array)
+    else:
+        return array
+
+
 class QLearningAgent:
-    def __init__(self, alpha, epsilon, discount, get_legal_actions):
-        """
-        Q-Learning Agent
-        based on https://inst.eecs.berkeley.edu/~cs188/sp19/projects.html
-        Instance variables you have access to
-          - self.epsilon (exploration prob)
-          - self.alpha (learning rate)
-          - self.discount (discount rate aka gamma)
-
-        Functions you should use
-          - self.get_legal_actions(state) {state, hashable -> list of actions, each is hashable}
-            which returns legal actions for a state
-          - self.get_qvalue(state,action)
-            which returns Q(state,action)
-          - self.set_qvalue(state,action,value)
-            which sets Q(state,action) := value
-        !!!Important!!!
-        Note: please avoid using self._qValues directly.
-            There's a special self.get_qvalue/set_qvalue for that.
-        """
-
-        self.get_legal_actions = get_legal_actions
+    def __init__(self, actions, alpha, epsilon, discount):
+        self.actions=actions
         self._qvalues = defaultdict(lambda: defaultdict(lambda: 0))
         self.alpha = alpha
         self.epsilon = epsilon
         self.discount = discount
 
     def get_qvalue(self, state, action):
-        """ Returns Q(state,action) """
-        return self._qvalues[state][action]
+        return self._qvalues[state][action] #뭐지.....왜안되지
 
     def set_qvalue(self, state, action, value):
-        """ Sets the Qvalue for [state,action] to the given value """
         self._qvalues[state][action] = value
 
-    #---------------------START OF YOUR CODE---------------------#
 
     def get_value(self, state):
-        """
-        Compute your agent's estimate of V(s) using current q-values
-        V(s) = max_over_action Q(state,action) over possible actions.
-        Note: please take into account that q-values can be negative.
-        """
-        possible_actions = self.get_legal_actions(state)
-
-        # If there are no legal actions, return 0.0
-        if len(possible_actions) == 0:
+        if len(self.actions) == 0:
             return 0.0
-        values = []
-        for action in possible_actions:
-          values.append(self.get_qvalue(state, action))
-
-        return max(values)
+        value=max(self.get_qvalue(state, action) for action in self.actions)
+        return value
 
     def update(self, state, action, reward, next_state):
-        """
-        You should do your Q-Value update here:
-           Q(s,a) := (1 - alpha) * Q(s,a) + alpha * (r + gamma * V(s'))
-        """
-
-        # agent parameters
         gamma = self.discount
         learning_rate = self.alpha
+        next_array=np.array(next_state)
+        s_array=np.array(state)
+        t_next_state=numpy_to_tuple(next_array)
+        t_state=numpy_to_tuple(s_array)
+        next_value=self.get_value(t_next_state)
+        current_qvalue=self.get_qvalue(t_state, action)
+        updated_qvalue=(1-learning_rate)*current_qvalue+learning_rate*(reward+gamma*next_value)
 
-        value = (1-learning_rate) * self.get_qvalue(state, action) + learning_rate * (reward + gamma * self.get_value(next_state))
-
-        self.set_qvalue(state, action, value )
+        self.set_qvalue(t_state, action, updated_qvalue) 
 
     def get_best_action(self, state):
-        """
-        Compute the best action to take in a state (using current q-values).
-        """
-        possible_actions = self.get_legal_actions(state)
 
-        # If there are no legal actions, return None
-        if len(possible_actions) == 0:
+        if len(self.actions) == 0:
             return None
+        best_action=max(self.actions, key=lambda action: self.get_qvalue(state, action))
 
-
-
-        return possible_actions[np.argmax([self.get_qvalue(state, action) for action in possible_actions])]
+        return best_action
 
     def get_action(self, state):
-        """
-        Compute the action to take in the current state, including exploration.
-        With probability self.epsilon, we should take a random action.
-            otherwise - the best policy action (self.get_best_action).
-
-        Note: To pick randomly from a list, use random.choice(list).
-              To pick True or False with a given probablity, generate uniform number in [0, 1]
-              and compare it with your probability
-        """
-
-        # Pick Action
-        possible_actions = self.get_legal_actions(state)
+        s_array=np.array(state)
+        t_state=numpy_to_tuple(s_array)
         action = None
-
-        # If there are no legal actions, return None
-        if len(possible_actions) == 0:
+        if len(self.actions) == 0:
             return None
-
-        # agent parameters:
         epsilon = self.epsilon
-
-        if random.random() < epsilon:
-            chosen_action = random.choice(possible_actions)
+        if random.random()<epsilon:
+          chosen_action=random.choice(self.actions)
         else:
-            chosen_action = self.get_best_action(state)
+          chosen_action=self.get_best_action(t_state)
 
         return chosen_action
-

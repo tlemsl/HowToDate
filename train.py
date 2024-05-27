@@ -10,13 +10,18 @@ def play_and_train(env, agent, t_max=10**4):
     - return total reward
     """
     total_reward = 0.0
-    s, _ = env.reset()
+    s=env.get_state()
 
     for t in range(t_max):
+        
         # get agent to pick action given state s.
-        a = agent.get_action(s)
-
-        next_s, r, done, _, _ = env.step(a)
+        r=0
+        for i in range(30):
+            pyautogui.press('enter')
+            time.sleep(0.2)
+        while r==0:
+            a = agent.get_action(s)
+            next_s, r, done, _, _ = env.step(a)
 
         # train (update) agent for state s
         agent.update(s, a,r,next_s)
@@ -35,7 +40,7 @@ if __name__ == "__main__":
             for t in ["d", "c"]:
                 actions.append((i,j,t))
     
-    env = DateSimulation(resolution="1024x576")
+    env = DateSimulation(resolution="720x405")
     agent = QLearningAgent(alpha=0.5, epsilon=0.2, discount=0.99,
                            get_legal_actions=actions)
     play_and_train(env=env, agent=agent)
