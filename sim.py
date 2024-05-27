@@ -33,10 +33,10 @@ class DateSimulation:
         self._start_x, self._start_y = start_pixel
         self._width, self._height = map(int, resolution.split('x'))
         self._scale = scale
-        self._threshold = 0.01
+        self._threshold = 0.001
     
     def _command_to_pixel(self, x, y):
-        return x//self._scale[0]*self._width + self._start_x, y//self._scale[1]*self._height + self._start_y
+        return x/self._scale[0]*self._width + self._start_x, y/self._scale[1]*self._height + self._start_y
 
     def get_image(self):
         return utill.PIL2OpenCV(ImageGrab.grab((self._start_x, self._start_y, self._start_x+self._width, self._start_y + self._height)))
@@ -52,6 +52,7 @@ class DateSimulation:
         if type=="c":
             pyautogui.moveTo(x,y)
             pyautogui.click()
+            print(x,y)
         elif type == "d":
             pyautogui.dragTo(x,y)
         time.sleep(1)
@@ -79,14 +80,15 @@ class DateSimulation:
             time.sleep(0.5)
             self._try_to_skip()
             current_state = self.get_state()
-            print(utill.similiaity(current_state, prev_state))
+            # print(utill.similiaity(current_state, prev_state))
             if utill.similiaity(current_state, prev_state) < self._threshold:
                 return current_state
             self._try_to_skip()
             prev_state = current_state
     
-    def _try_to_skip(self):
-        pyautogui.press("space")
+    def _try_to_skip(self, cnt = 10):
+        for i in range(cnt):
+            pyautogui.press("space")
 
     def get_reward(self):
         return 0.0, False

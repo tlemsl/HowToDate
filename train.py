@@ -21,11 +21,13 @@ def play_and_train(env, agent, t_max=10**4):
         # for i in range(30):
         #     pyautogui.press('enter')
         #     time.sleep(0.2)
+        next_s = s
         while r==0:
             a = agent.get_action(s)
-            print(a)
+            print(a, r)
             
             next_s, r, done= env.step(s, a)
+            print(r)
 
         # train (update) agent for state s
         agent.update(s, a,r,next_s)
@@ -41,9 +43,9 @@ if __name__ == "__main__":
     actions = []
     for i in range(18):
         for j in range(10):
-            for t in ["d", "c"]:
+            for t in ["c"]:
                 actions.append((i,j,t))
     
     env = DateSimulation(resolution="720x405")
-    agent = QLearningAgent(actions, alpha=0.5, epsilon=0.2, discount=0.99)
+    agent = QLearningAgent(actions, alpha=0.5, epsilon=0.7, discount=0.99)
     play_and_train(env=env, agent=agent)
