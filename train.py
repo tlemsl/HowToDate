@@ -2,6 +2,7 @@ from sim import DateSimulation
 from agent import QLearningAgent
 import pyautogui
 import time
+import matplotlib.pyplot as plt
 
 
 def play_and_train(env, agent, t_max=10**4):
@@ -48,4 +49,12 @@ if __name__ == "__main__":
     
     env = DateSimulation(resolution="720x405")
     agent = QLearningAgent(actions, alpha=0.5, epsilon=0.7, discount=0.99)
-    play_and_train(env=env, agent=agent)
+    # play_and_train(env=env, agent=agent)
+    rewards = []
+    for i in range(20):
+        rewards.append(play_and_train(env, agent))
+        agent.epsilon *= 0.99
+        if True:
+            plt.title('eps = {:e}, mean reward = {:.1f}'.format(agent.epsilon, np.mean(rewards[-10:])))
+            plt.plot(rewards)
+            plt.show()
