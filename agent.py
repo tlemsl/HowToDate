@@ -3,9 +3,6 @@ import random
 import math
 import numpy as np
 
-
-
-
 class QLearningAgent:
     def __init__(self, actions, alpha, epsilon, discount):
         self.actions=actions
