@@ -25,10 +25,8 @@ def play_and_train(env, agent, t_max=10**4):
         next_s = s
         while r==0:
             a = agent.get_action(s)
-            print(f"Action {a}")
-            
             next_s, r, done= env.step(s, a)
-            print(f"reward {r}")
+            print(f"Action {a}, and reward {r}")
 
         # train (update) agent for state s
         agent.update(s, a,r,next_s)
@@ -51,9 +49,10 @@ if __name__ == "__main__":
     agent = QLearningAgent(actions, alpha=0.5, epsilon=0.7, discount=0.99)
     # play_and_train(env=env, agent=agent)
     rewards = []
-    for i in range(20):
+    for i in range(10000):
         rewards.append(play_and_train(env, agent))
         agent.epsilon *= 0.99
+        print(rewards[-1])
         if True:
             plt.title('eps = {:e}, mean reward = {:.1f}'.format(agent.epsilon, np.mean(rewards[-10:])))
             plt.plot(rewards)

@@ -25,7 +25,7 @@ action
 
 """
 class DateSimulation:
-    def __init__(self, resolution = "720x405", start_pixel = (0,30), scale=(20, 15), roi = ((100,100), (500, 400))) -> None:
+    def __init__(self, resolution = "720x405", start_pixel = (0,30), scale=(20, 15), roi = ((120,50), (500, 420))) -> None:
         
         self._good_ending   = cv2.imread("images/good_ending.png", cv2.IMREAD_COLOR)
         self._bad_ending    = cv2.imread("images/bad_ending.png", cv2.IMREAD_COLOR)
@@ -66,7 +66,7 @@ class DateSimulation:
         next_state=self.get_state()
         reward=0
         b, v = self._sim_checker.check(state, next_state)
-        print(f"Action similarity result: {v}")
+        # print(f"Action similarity result: {v}")
         if not b: #유사도 측정 방법 변경
             reward=1
             next_state=self._wait_for_stabilized()
@@ -89,7 +89,7 @@ class DateSimulation:
             self._try_to_skip()
             current_state = self.get_state()
             b, v = self._sim_checker.check(prev_state, current_state)
-            print(f"Stabilizing similarity result: {v}")
+            # print(f"Stabilizing similarity result: {v}")
             if b:
                 return current_state
             self._try_to_skip()
@@ -103,22 +103,23 @@ class DateSimulation:
         return 0.0, False
 
     def reset(self):
-        if self._sim_checker.ending_check(self.get_image()):
-            pyautogui.moveTo(360 + self._start_x, 350 + self._start_y)
-            pyautogui.click()
-            time.sleep(0.1)
-        else:
-            pyautogui.moveTo(690 + self._start_x, 40 + self._start_y)
-            pyautogui.click()
-            time.sleep(0.1)
-            pyautogui.moveTo(360 + self._start_x, 230 + self._start_y)
-            pyautogui.click()
-            time.sleep(0.1)
-        
+        sleep_time = 0.2
+        # if self._sim_checker.ending_check(self.get_image()):
+        #     pyautogui.moveTo(360 + self._start_x, 350 + self._start_y)
+        #     pyautogui.click()
+        #     time.sleep(sleep_time)
+        # else:
+        pyautogui.moveTo(690 + self._start_x, 40 + self._start_y)
+        pyautogui.click()
+        time.sleep(sleep_time)
+        pyautogui.moveTo(360 + self._start_x, 230 + self._start_y)
+        pyautogui.click()
+        time.sleep(sleep_time)
+    
 
         pyautogui.moveTo(550 + self._start_x, 210 + self._start_y)
         pyautogui.click()
-        time.sleep(0.1)
+        time.sleep(sleep_time)
         pyautogui.moveTo(150 + self._start_x, 200 + self._start_y)
         pyautogui.click()
         time.sleep(2)
