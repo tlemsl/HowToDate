@@ -2,6 +2,9 @@ import cv2
 import numpy as np
 import matplotlib.pylab as plt
 import time
+import pyautogui
+from PIL import ImageGrab
+
 class SimilarityChecker:
     def __init__(self, normal_img, bad_img, threshold = 0.001):
         self._normal_img = normal_img
@@ -64,3 +67,31 @@ def PIL2OpenCV(pil_image):
     numpy_image= np.array(pil_image)
     opencv_image = cv2.cvtColor(numpy_image, cv2.COLOR_RGB2BGR)
     return opencv_image
+
+
+def reset_position():
+    #love choice click
+    while True:
+        fore=pyautogui.getActiveWindow()
+        print(fore.title)
+        if fore.title=="LoveChoice":
+            break
+        time.sleep(1)
+    print(fore.size)
+    img=ImageGrab.grab((fore.left+8, fore.top+31, fore.right-8, fore.bottom-8))
+    return [fore.left+8, fore.top+31, fore.right-8, fore.bottom-8], img
+    
+def cal_ending(img):
+    img_arr=np.array(img) #튜플인지 확인
+    R=0
+    for i in range(len(img_arr)):
+        for j in range(len(img_arr[0])):
+            R+=img_arr[i][j][0]
+
+    R=R/(len(img_arr)*len(img_arr[0]))
+    print(R)
+    if R>244:
+        return 20
+    else: 
+        return 10
+
