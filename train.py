@@ -23,10 +23,13 @@ def play_and_train(env, agent, t_max=1000):
         #     pyautogui.press('enter')
         #     time.sleep(0.2)
         next_s = s      
-        while r==0:       
-            a = agent.get_action(s)
-            next_s, r, done= env.step(s, a)
-            print(f"Action {a}, and reward {r}")
+        # while r==0:
+        start_time = time.time()
+        a = agent.get_action(s)
+        print(f"Do Action: {a}")
+
+        next_s, r, done= env.step(s, a)
+        print(f"Reward: {r} Feedback time {time.time() - start_time}")
 
         # train (update) agent for state s
         agent.update(s, a,r,next_s)
@@ -39,6 +42,7 @@ def play_and_train(env, agent, t_max=1000):
     return total_reward
 
 if __name__ == "__main__":
+    model_path = "data/test.pkl"
     actions = []
     for i in range(20):
         for j in range(15):
@@ -49,13 +53,15 @@ if __name__ == "__main__":
     start_tuple=utill.numpy2tuple(start_arr)
     env = DateSimulation(place, start_tuple)
     
-    agent = QLearningAgent(actions, alpha=0.5, epsilon=0.7, discount=0.99)
+    agent = QLearningAgent(model_path, actions, alpha=0.5, epsilon=0.7, discount=0.99)
+    agent.load_qvalues()
     #play_and_train(env=env, agent=agent)
     #env.reset()
     rewards = []
     for i in range(1000):
         rewards.append(play_and_train(env, agent))
-        agent.epsilon *= 0.9 #값 수정함
+        agent.epsilon *= 0.9 #값 수정함a
+        agent.save_qvalues()
         print(rewards[-1])
         if True:
             plt.title('eps = {:e}, mean reward = {:.1f}'.format(agent.epsilon, np.mean(rewards[-10:])))

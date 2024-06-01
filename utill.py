@@ -6,12 +6,13 @@ import pyautogui
 from PIL import ImageGrab
 
 class SimilarityChecker:
-    def __init__(self, normal_img, bad_img, threshold = 0.001):
+    def __init__(self, normal_img, bad_img, threshold = 0.00001):
         self._normal_img = normal_img
         self._bad_img = bad_img
         self._normal_hist = self._histogramization(self._normal_img)
         self._bad_hist = self._histogramization(self._bad_img)
         self._threshold= threshold
+        self._check_type = 4
 
     def _histogramization(self, img):
         hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
@@ -20,35 +21,49 @@ class SimilarityChecker:
         return hist
     
     def ending_check(self, img):
+        start_time = time.time()
+
         if isinstance(img, tuple):
             img = tuple2numpy(img)
         type = 0 # 0 -> not an ending, 1-> bad ending, 2->normal ending 
         hist = self._histogramization(img)
-
-        if cv2.compareHist(hist, self._bad_hist, 4) < self._threshold:
+        print(cv2.compareHist(hist, self._bad_hist, self._check_type))
+        print(cv2.compareHist(hist, self._normal_hist, self._check_type))
+        if cv2.compareHist(hist, self._bad_hist, self._check_type) < self._threshold:
             type = 1
-        elif cv2.compareHist(hist, self._normal_hist, 4) < self._threshold:
+        elif cv2.compareHist(hist, self._normal_hist, self._check_type) < self._threshold:
             type = 2
+        # print(f"Ending check calc time: {time.time() - start_time}")
+
         return type
     
     def check(self, img1, img2):
+        start_time = time.time()
         imgs = [img1, img2]
         hists = []
         for img in imgs:
             start_time = time.time()
             if isinstance(img, tuple):
                 img = tuple2numpy(img)
-            hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-            hist = cv2.calcHist([hsv], [0, 1], None, [180, 256], [0, 180, 0, 256])
-            cv2.normalize(hist, hist, 0, 1, cv2.NORM_MINMAX)
-            hists.append(hist)
-        ret = cv2.compareHist(hists[0], hists[1], 4)
-
-        return ret < self._threshold, ret 
-            
-
-
+            hists.append(self._histogramization(img))
+        ret = cv2.compareHist(hists[0], hists[1], self._check_type)
+        # print(f"Sim check calc time : {time.time() - start_time}")
+        return ret < self._threshold, ret
     
+    def bf_check(self, img1, img2):
+        start_time = time.time()
+
+        imgs = [img1, img2]
+        np_imgs = []
+        for img in imgs:
+            if isinstance(img, tuple):
+                img = tuple2numpy(img)
+            np_imgs.append(img)
+        # print(f"Sim bf check calc time : {time.time() - start_time}")
+
+        return (np.abs(np_imgs[0] - np_imgs[1]) < self._threshold).all()
+
+        
 
 
 def numpy2tuple(array):
