@@ -4,6 +4,23 @@ import matplotlib.pylab as plt
 import time
 import pyautogui
 from PIL import ImageGrab
+import csv
+
+def save_rewards(rewards, filename):
+    with open(filename, mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(["reward"])
+        for reward in rewards:
+            writer.writerow([reward])
+
+def load_rewards(filename):
+    rewards = []
+    with open(filename, mode='r') as file:
+        reader = csv.reader(file)
+        next(reader)  # Skip header row
+        for row in reader:
+            rewards.append(float(row[0]))
+    return rewards
 
 class SimilarityChecker:
     def __init__(self, normal_img, bad_img, threshold = 0.00001):
@@ -27,11 +44,11 @@ class SimilarityChecker:
             img = tuple2numpy(img)
         type = 0 # 0 -> not an ending, 1-> bad ending, 2->normal ending 
         hist = self._histogramization(img)
-        print(cv2.compareHist(hist, self._bad_hist, self._check_type))
-        print(cv2.compareHist(hist, self._normal_hist, self._check_type))
-        if cv2.compareHist(hist, self._bad_hist, self._check_type) < self._threshold:
+        # print(cv2.compareHist(hist, self._bad_hist, self._check_type))
+        # print(cv2.compareHist(hist, self._normal_hist, self._check_type))
+        if cv2.compareHist(hist, self._bad_hist, self._check_type) < 0.1:
             type = 1
-        elif cv2.compareHist(hist, self._normal_hist, self._check_type) < self._threshold:
+        elif cv2.compareHist(hist, self._normal_hist, self._check_type) < 0.1:
             type = 2
         # print(f"Ending check calc time: {time.time() - start_time}")
 

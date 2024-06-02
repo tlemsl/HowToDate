@@ -5,13 +5,13 @@ import numpy as np
 import pickle
 
 class QLearningAgent:
-    def __init__(self, path, actions, alpha, epsilon, discount):
+    def __init__(self,actions, alpha, epsilon, discount):
         self.actions=actions
         self._qvalues = defaultdict(lambda: defaultdict(lambda: 0))
         self.alpha = alpha
         self.epsilon = epsilon
         self.discount = discount
-        self._filepath = path
+        
 
     def get_qvalue(self, state, action):
         return self._qvalues[state][action] 
@@ -55,16 +55,16 @@ class QLearningAgent:
 
         return chosen_action
 
-    def save_qvalues(self):
+    def save_qvalues(self, filepath):
         """Save the Q-values to a file."""
-        with open(self._filepath, 'wb') as f:
+        with open(filepath, 'wb') as f:
             # Convert the nested defaultdict to a regular dictionary
             qvalues_dict = {state: dict(actions) for state, actions in self._qvalues.items()}
             pickle.dump(qvalues_dict, f)
 
-    def load_qvalues(self):
+    def load_qvalues(self, filepath):
         """Load the Q-values from a file."""
-        with open(self._filepath, 'rb') as f:
+        with open(filepath, 'rb') as f:
             qvalues_dict = pickle.load(f)
             # Convert the loaded dictionary back to a nested defaultdict
             self._qvalues = defaultdict(lambda: defaultdict(lambda: 0), 
