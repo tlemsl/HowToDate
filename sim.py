@@ -4,7 +4,7 @@ from PIL import ImageGrab
 from PIL import Image
 import numpy as np
 import cv2
-
+from game import Game
 import utill
 pyautogui.FAILSAFE = False
 """
@@ -25,95 +25,13 @@ action
 
 """
 class DateSimulation:
-    def __init__(self, place, start_img, scale=(20, 15), roi = ((120,50), (500, 420))) -> None:
-        self._start_x, self._start_y = place[0], place[1]
-        self._width, self._height = place[2]-place[0], place[3]-place[1]
-        self._start_img=start_img
-          
-        
-        self._roi = roi
-        self._roi_start_x, self._roi_start_y = self._roi[0][0]+place[0], self._roi[0][1]+place[1]
-        self._roi_width, self._roi_height = roi[1][0] - roi[0][0], roi[1][1] - roi[0][1] #map(int, resolution.split('x'))
-        
-        self._scale = scale
-        self._threshold = 0.001
-        #self._sim_checker = utill.SimilarityChecker(self._normal_ending, self._bad_ending, self._threshold)
-    
-    def _command_to_pixel(self, x, y):
-        return x+self._start_x, y+self._start_y #x/self._scale[0]*self._roi_width + self._roi_start_x, y/self._scale[1]*self._roi_height + self._roi_start_y
+    def __init__(self, game) -> None:
+        self.game=game
 
-    def get_image(self):
-        return ImageGrab.grab((self._start_x, self._start_y, self._start_x+self._width, self._start_y + self._height))
-    
-    def get_state(self):
-        image=self.get_image()
-        image_array=np.array(image)
-        return utill.numpy2tuple(image_array) #self._wait_for_stabilized()
-    
-    def step(self, state, action):
-        x, y, type = action
-        x, y = self._command_to_pixel(x,y)
-        if type=="c":
-            pyautogui.moveTo(x,y)
-            pyautogui.click()
-        elif type == "d":
-            pyautogui.dragTo(x,y)
-        time.sleep(1)
-        next_state=self.get_state()
-        reward=-1    
-        done=False
-        if state!=next_state: #유사도 측정 방법 변경
-            reward=1
-            done, next_state=self._wait_for_stabilized()
-        #type = self._sim_checker.ending_check(next_state)
-        if done: #유사도
-            reward=utill.cal_ending(next_state)
-        return  next_state, reward, done
-
-    def _wait_for_stabilized(self):
-        prev_state = self.get_state()
-        while True:
-            self._try_to_skip()
-            time.sleep(8)
-            current_state = self.get_state()
-            if current_state==self._start_img:
-                print(1)
-                 
-                return True, prev_state
-            # print(f"Stabilizing simil     arity result: {v}")
-            if prev_state==current_state:
-                return False, current_state
-            #self._try_to_skip()
-            prev_state = current_state
-    
-    def _try_to_skip(self, cnt = 6):
-        for i in range(cnt):
-            pyautogui.press("space")
-   
-    #def get_reward(self):
-        #return 0.0, False
+    def step(self, state, action, answer, reward):
+        next_state, new_answer, new_reward, done=self.game(state, action, answer, reward)
+        return  next_state, new_answer, new_reward, done
 
     def reset(self):
-        sleep_time = 0.4
-        # if self._sim_checker.ending_check(self.get_image()):
-        #     pyautogui.moveTo(360 + self._start_x, 350 + self._start_y)
-        #     pyautogui.click()
-        #     time.sleep(sleep_time)
-        # else:
-        pyautogui.moveTo(680 + self._start_x, 30 + self._start_y)
-        pyautogui.click()
-        
-        time.sleep(sleep_time)
-        pyautogui.moveTo(360 + self._start_x, 230 + self._start_y)
-        pyautogui.click()
-        time.sleep(sleep_time)
-    
-
-        pyautogui.moveTo(550 + self._start_x, 210 + self._start_y)
-        pyautogui.click()
-        time.sleep(sleep_time)
-        pyautogui.moveTo(150 + self._start_x, 200 + self._start_y)
-        pyautogui.click()
-        time.sleep(2)
-        return self._wait_for_stabilized()
+        return 1
     
